@@ -1,0 +1,35 @@
+{
+  "name": "firebase_next",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@stripe/stripe-js": "^1.53.0",
+    "@types/node": "20.1.0",
+    "@types/react": "18.2.6",
+    "@types/react-dom": "18.2.4",
+    "autoprefixer": "10.4.14",
+    "body-parser": "^1.20.2",
+    "crypto-js": "^4.1.1",
+    "daisyui": "^2.51.6",
+    "eslint-config-next": "^13.4.4",
+    "firebase": "^9.21.0",
+    "micro": "^10.0.1",
+    "next": "^13.4.4",
+    "postcss": "8.4.23",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-firebase-hooks": "^5.1.1",
+    "stripe": "^12.6.0",
+    "tailwindcss": "3.3.2",
+    "typescript": "5.0.4"
+  },
+  "devDependencies": {
+    "encoding": "^0.1.13"
+  }
+}

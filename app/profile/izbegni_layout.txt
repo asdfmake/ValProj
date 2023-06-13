@@ -1,0 +1,1 @@
+izbegni layout tako sto koristis dva foldera cija su imena u zagradama (koristi layout) (ne koristi layout)

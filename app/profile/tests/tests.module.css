@@ -1,0 +1,43 @@
+.cards-holder{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.cards-holder h1{
+    display: block;
+    font-size: 1.8rem;
+}
+
+.cards-holder > div{
+    display: grid;
+    gap: 15px;
+    grid-template-columns: auto auto auto;
+}
+
+.card{
+    width: 250px;
+    padding: 2.5vw;
+    padding: 20px 15px;
+    border: 2px solid #ffff;
+    border-radius: 15px;
+    text-align: center;
+}
+
+.card > p{
+    display: inline;
+}
+
+.card > img{
+    width: 150px;
+    height: 150px;
+    object-fit: contain;
+    margin: 20px auto;
+}
+
+.card > button{
+    display: block;
+    margin: auto;
+    margin-top: 15px;
+}
