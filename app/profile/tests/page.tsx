@@ -4,6 +4,7 @@ import { auth } from "@/firebase/firebaseClient"
 import { getUserData, getTests, devFunction } from "@/firebase/userFunctions";
 import { useState, useEffect, use } from "react";
 import { DocumentData } from "firebase/firestore";
+import { useRouter } from 'next/navigation';
 
 import styles from "./tests.module.css"
 
@@ -20,6 +21,8 @@ export default function testsPage() {
     const [userData, setUserData] = useState(Object)
     const [tests, setTests] = useState<any>(null)
 
+    const router = useRouter()
+
     useEffect(() => {
         if (user) {
             let load = async ()=>{
@@ -34,6 +37,11 @@ export default function testsPage() {
     }, [user]); // Include the 'user' dependency in the dependency array
     
 
+    function goToTest(test: string){
+        if (typeof window !== 'undefined') {
+            router.push(window.location.pathname + "/" + test)
+        }
+    }
     
 
     if(user){
@@ -58,7 +66,7 @@ export default function testsPage() {
                                     <h2>{item.id}</h2>
                                     <img src={item.data.info.img} alt="slika se sjebala" />
                                     <p>{item.data.info.desciption}</p>
-                                    <button className="btn">Odradi</button>
+                                    <button className="btn" onClick={()=>{goToTest(item.id)}}>Odradi</button>
                                 </div>
                             ))
                         }{/* TYPO U INFO.DESCIPTION CRINGE ALART */}

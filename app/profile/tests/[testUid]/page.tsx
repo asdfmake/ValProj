@@ -5,7 +5,7 @@ import { getTests, getUserData } from '@/firebase/userFunctions';
 import React, { useEffect, useState } from 'react';
 import { useAuthState } from 'react-firebase-hooks/auth';
 
-const Quiz = () => {
+const Quiz = ({params}: any) => {
   const [user, loading] = useAuthState(auth);
   const [userData, setUserData] = useState(Object)
   const [test, setTest] = useState<any>(null)
@@ -17,7 +17,7 @@ const Quiz = () => {
               setUserData(data)
 
               let tests = await getTests(data!)
-              setTest(tests.find((nesto:any) => nesto.id == "test1"))
+              setTest(tests.find((nesto:any) => nesto.id == params.testUid))
           }
           load()
           
@@ -28,30 +28,7 @@ const Quiz = () => {
   const [answers, setAnswers] = useState<any>([]);
 
   if(test){
-    console.log(test.data.pitanja)
-    /* const questions = [
-      {
-        question: "What is the capital of France?",
-        options: ["London", "Paris", "Berlin", "Rome"],
-        answer: "Paris"
-      },
-      {
-        question: "Which planet is known as the Red Planet?",
-        options: ["kita", "kita", "kita", "kita"],
-        answer: "kita"
-      },
-      {
-          question: "Which planet is known as the Red Planet?",
-          options: ["picka", "picka", "picka", "picka"],
-          answer: "picka"
-      },
-      {
-          question: "Which planet is known as the Red Planet?",
-          options: ["nesto", "nesto", "nesto", "nesto"],
-          answer: "nesto"
-      },
-      // Add more questions here
-    ]; */
+    console.log(test.data)
     const questions = test.data.pitanja;
 
     const handleAnswer = ( answer: string) => {
@@ -61,7 +38,7 @@ const Quiz = () => {
     }
     
     return (
-      <div className="bg-base-100">
+      <div className="bg-base-100 pt-10">
         {currentQuestion < questions.length ? (
           <div className="max-w-lg mx-auto text-center">
             <h1 className="text-lg font-medium mb-4 text-3xl">Pitanje {currentQuestion + 1}</h1>
@@ -97,7 +74,13 @@ const Quiz = () => {
       </div>
     );
   }
+  else if(test == undefined || test == null){
+    return(
+      <p>Pogresan link</p>
+    )
+  }
   else{
+    console.log(test)
     return "loading test"
   }
   
