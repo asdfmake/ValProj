@@ -18,7 +18,7 @@ export default function Header(){
     else{
 
         return(
-            <div className="navbar bg-base-100 top-0 sticky z-20">
+            <div className="navbar bg-base-100 top-0 sticky z-20 h-[30px] border-b-[1px] border-gray-800">
                 <div className="navbar-start">
                     <div className="dropdown">
                     <label tabIndex={0} className="btn btn-ghost lg:hidden">
