@@ -1,5 +1,6 @@
 "use client"
 
+import Link from 'next/link';
 import { firestore } from "@/firebase/firebaseClient";
 import { collection, doc, getDoc, getDocs    ,setDoc } from "firebase/firestore";
 import { useEffect, useState } from "react";
@@ -21,6 +22,10 @@ async function fetchLessons(){
         return 0
     }
 
+}
+
+function gotoLesson(lessonId: string){
+    console.log(lessonId)
 }
 
 export default function lekcijePage({params}: any) {
@@ -49,7 +54,7 @@ export default function lekcijePage({params}: any) {
                                     <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">
                                         <h1 className="text-4xl font-bold text-white">{item.naslov}</h1>
                                         <p className="mt-4 text-xl text-white">{item.opis}</p>
-                                        <button className="btn block m-auto opacity-80 mt-4">learn more</button>
+                                        <button className="btn block m-auto opacity-80 mt-4"><Link href={"profile/lekcija/" + item.id}>learn more</Link></button>
                                     </div>
                                 </div>
                             </figure>

@@ -5,11 +5,12 @@ import { getUserData } from '@/firebase/userFunctions'
 import { doc, getDoc } from "firebase/firestore";
 import { useEffect, useState } from "react";
 
-async function fetchLesson(){
+async function fetchLesson(lekcijaUid: string){
     try {
-        let lekcija = (await getDoc(doc(firestore, 'content', "premium", 'lekcije', "astrologijaBull"))).data();
+        let lekcija = (await getDoc(doc(firestore, 'content', "premium", 'lekcije', lekcijaUid))).data();
         await getDoc(doc(firestore, 'content', "premium", 'testovi', lekcija!.testUid)).then(e=>{lekcija!.test = e.data(); delete lekcija!.testUid; console.log(e.data())})
         /* mozda nema potrebe da fetchujem i test neka se samo redirectuje na page za to */
+        console.log(lekcija)
         return lekcija 
     } catch (error) {
         return 0
@@ -26,7 +27,7 @@ export default function lekcijaPage({params}: any) {
 
     useEffect(() => {
         if(!lesson){
-            fetchLesson().then(e=>{
+            fetchLesson(params.lekcijaUid).then(e=>{
                 console.log(e)
                 getLesson(e)
             }).catch(e=>{

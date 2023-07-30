@@ -41,8 +41,7 @@ async function loginWithAuth(e: any, providerStr: string){
         break;
     }
 
-
-    signInWithPopup(auth, provider).then(userCred=>{ 
+    await signInWithPopup(auth, provider).then(userCred=>{ 
         getUserData(userCred.user.uid)
         checkForUser(userCred.user).then(()=>{
           //user exists
@@ -56,11 +55,13 @@ async function loginWithAuth(e: any, providerStr: string){
           /* logOut(); */
         })
         
+    }).then(e=>{
+      console.log("logged in successfully")
+      
     }).catch(e=>{
       console.error("user didn't login")
     })
-
-    
+    return 1;
     //can return error or exeption if user does not exits
 }
 
@@ -109,40 +110,15 @@ async function upgradeUser(userId: string){
 }
 
 async function devFunction(){
-  /* await setDoc(doc(firestore, "content", "premium", "testovi", "test1"), {
-    "info":{
-      "img": "imglink",
-      "tezina": 3,
-      "desciption": "neki opis za neki test 1"
-    },
-
-      "pitanja": [
-          {
-              "opcije": [
-                  "opcija1",
-                  "opcija2",
-                  "opcija3",
-                  "tacan odgovor"
-              ],
-              "pitanje": "neko pitanje",
-              "odgovor": "tacan odgovor"
-          },
-          {
-              "odgovor": "odgovor2",
-              "pitanje": "neko pitanje 2",
-              "opcije": [
-                  "opcija1 za 2",
-                  "opcija2 za 2",
-                  "opcija3 za 3",
-                  "odgovor2"
-              ]
-          }
-      ]
-  }); */
-
-/*   const nesto = await getDoc(doc(firestore, 'content', "premium", 'testovi', "test3"));
-  console.log(nesto.data()) */
-
+  await setDoc(doc(firestore, "content", "premium", "lekcije", "ovan"), {
+    
+      "objasnjenje": "                Lorem ipsum dolor sit amet consectetur adipisicing elit.                  <h2>neki naslov u tekstu</h2>                 Dicta mollitia repellat aspernatur! Incidunt aperiam deserunt fugiat earum odit quibusdam qui quae, rem vero quia, voluptatum blanditiis esse ab expedita! Dolore sed fuga nostrum, cum adipisci doloribus? Ut delectus, quae maxime nihil rem, error consequuntur, laborum sit harum consequatur voluptas in odit explicabo quia corrupti quidem! Odit pariatur optio vitae amet expedita placeat nesciunt eius illum cupiditate tempora aspernatur corrupti vero rerum tempore mollitia voluptatibus modi, ipsum error nulla! Ipsa ad voluptatibus cum beatae quaerat doloribus ut laborum odit dolor obcaecati iusto suscipit, error nulla pariatur quia temporibus hic sapiente? Quis aliquid ex doloribus dolore est quidem laboriosam quo architecto error consectetur ipsam officiis temporibus similique beatae, omnis laborum assumenda facere.",
+      "slikaUrl": "https://www.alo.rs/data/images/2022-04-11/635620_shutterstock-777332347_f.webp?timestamp=1649628000",
+      "naslov": "Ovan osnove",
+      "Opis": "Ovan je poznat kao prvi horoskopski znak. Vlada prvom kucom astrala ili ti ascendent-om (podznakom) horoskopa. Ovan je vatreni znak, sta jos mogu da se iskenjam u opisu",
+      "testUid": "test2"
+  
+  })
 }
 
 export {isUserPremium, loginWithAuth, signUp, checkForUser, logOut, getUserData, upgradeUser, getTests, devFunction}

@@ -5,7 +5,7 @@ import stripe from "../../../stripe/stripeClient"
 
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY!);
-
+//NE MOZE DA RADI BEZ STRIPE CLI A
 
 export async function POST(req: Request, res: NextApiResponse) {
     if (req.method === 'POST') {

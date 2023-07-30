@@ -1,34 +1,18 @@
 "use client";
-
-//import React, {ReactElement} from "react";
-import { useEffect } from "react";
-import { auth, firebase, firestore } from "../../firebase/firebaseClient";
-//import { getAuth, signInWithPopup, GoogleAuthProvider, signOut } from "firebase/auth";
 import { isUserPremium, loginWithAuth, signUp, checkForUser, logOut} from "@/firebase/userFunctions";
-import { useAuthState } from "react-firebase-hooks/auth";
 import { redirect, useRouter } from "next/navigation";
 
+import Router from 'next/router'
+import { useEffect, useState } from "react";
+
 export default function loginPage() {
-  //const [user, loading] = useAuthState(auth);
-  function kita() {
-    console.log("redir");
-    redirect("/nseto");
-  }
-  const { push } = useRouter();
 
-/*   function login(provider: string){
-    let userCred;
+  const [loggedIn, setLoggedIn] = useState(false);
+  useEffect(() => {
+    if(loggedIn)
+      redirect('/profile')
+  });
 
-    switch (provider) {
-        case "withGoogle":
-            
-            break;
-    
-        default:
-            userCred = null;
-            break;
-    }
-  } */
 
   return (
     <main>
@@ -67,7 +51,7 @@ export default function loginPage() {
                     <button
                       className="bg-white active:bg-slate-50 text-slate-700 font-normal px-4 py-2 rounded outline-none focus:outline-none mr-1 mb-1 uppercase shadow hover:shadow-md inline-flex items-center font-bold text-xs ease-linear transition-all duration-150"
                       type="button"
-                      onClick={(e)=>{loginWithAuth(e, "withGoogle")}}
+                      onClick={(e)=>{loginWithAuth(e, "withGoogle").then(c=>{setLoggedIn(true)})}}
                     >
                       <img
                         alt="..."
