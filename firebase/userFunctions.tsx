@@ -1,6 +1,6 @@
 import { firebase, auth, firestore } from "../firebase/firebaseClient"
 
-import { collection, query, where, getDocs, setDoc, doc, getDoc } from 'firebase/firestore';
+import { collection, query, where, getDocs, setDoc, doc, getDoc, arrayUnion } from 'firebase/firestore';
 
 import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, UserCredential, User } from "firebase/auth";
 
@@ -88,7 +88,7 @@ async function getUserData(userUid: string){
   return userData;
 }
 
-async function getTests(userData:object){
+async function getTests(testID: string){
   //moze ovde provera da li je user premium
   const nesto = await getDoc(doc(firestore, 'content', "premium", 'testovi', "test1"));
 
@@ -103,20 +103,21 @@ async function getTests(userData:object){
   return moguciTestovi
 }
 
-async function upgradeUser(userId: string){
+async function upgradeUser(userId: string, product: string){
+  console.log("product is: ", product)
   firestore.collection("users").doc(userId).update({
-    profileTier: "upgraded"
+    products: arrayUnion(product)
   })
 }
 
 async function devFunction(){
-  await setDoc(doc(firestore, "content", "premium", "lekcije", "ovan"), {
+  await setDoc(doc(firestore, "content", "lekcije", "teir2", "bigDickShit"), {
     
       "objasnjenje": "                Lorem ipsum dolor sit amet consectetur adipisicing elit.                  <h2>neki naslov u tekstu</h2>                 Dicta mollitia repellat aspernatur! Incidunt aperiam deserunt fugiat earum odit quibusdam qui quae, rem vero quia, voluptatum blanditiis esse ab expedita! Dolore sed fuga nostrum, cum adipisci doloribus? Ut delectus, quae maxime nihil rem, error consequuntur, laborum sit harum consequatur voluptas in odit explicabo quia corrupti quidem! Odit pariatur optio vitae amet expedita placeat nesciunt eius illum cupiditate tempora aspernatur corrupti vero rerum tempore mollitia voluptatibus modi, ipsum error nulla! Ipsa ad voluptatibus cum beatae quaerat doloribus ut laborum odit dolor obcaecati iusto suscipit, error nulla pariatur quia temporibus hic sapiente? Quis aliquid ex doloribus dolore est quidem laboriosam quo architecto error consectetur ipsam officiis temporibus similique beatae, omnis laborum assumenda facere.",
       "slikaUrl": "https://www.alo.rs/data/images/2022-04-11/635620_shutterstock-777332347_f.webp?timestamp=1649628000",
-      "naslov": "Ovan osnove",
-      "Opis": "Ovan je poznat kao prvi horoskopski znak. Vlada prvom kucom astrala ili ti ascendent-om (podznakom) horoskopa. Ovan je vatreni znak, sta jos mogu da se iskenjam u opisu",
-      "testUid": "test2"
+      "naslov": "nekiDrugiPeder osnove",
+      "Opis": "bigDickShit je poznat kao prvi horoskopski znak. Vlada prvom kucom astrala ili ti ascendent-om (podznakom) horoskopa. Ovan je vatreni znak, sta jos mogu da se iskenjam u opisu",
+      "testUid": "test1"
   
   })
 }

@@ -20,14 +20,11 @@ export default function ProfileLayout({
 
   else if(user){
     return (
-      <html lang="en" data-theme="winter">
-        
-        <body>
-          <Header />
-          {children}
-          
-        </body>
-      </html>
+      <>
+        <Header />
+        {children}
+      </>
+      
     )
   }
   else if(!user){
@@ -35,3 +32,10 @@ export default function ProfileLayout({
   }
   
 }
+/* <html lang="en" data-theme="winter">
+        
+        <body>
+          
+          
+        </body>
+      </html> */

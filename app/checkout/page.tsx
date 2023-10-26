@@ -3,21 +3,20 @@
 import { loadStripe } from "@stripe/stripe-js";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "../../firebase/firebaseClient";
+import Encrypt from "./EncryptData";
 const CryptoJS = require("crypto-js");
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY!);
 
-import Encrypt from "./EncryptData";
 
 export default function checkoutPage() {
   const [user, loading] = useAuthState(auth);
 
-
   const handleCheckout = async (userId: string) => {
     const stripe = await stripePromise;
 
-    // Make a request to your server to create a new Stripe Checkout Session
-    const response = await fetch("/api/create-checkout-session", {
+    // menjaj link ispod da dobijes adekvatan session
+    const response = await fetch("/api/create-checkout-session/teir1checkout", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

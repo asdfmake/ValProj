@@ -1,111 +1,136 @@
 "use client"
-
-import Link from 'next/link';
-import { firestore } from "@/firebase/firebaseClient";
-import { collection, doc, getDoc, getDocs    ,setDoc } from "firebase/firestore";
+import { auth, firestore } from "@/firebase/firebaseClient";
 import { useEffect, useState } from "react";
-import styles from "./lekcija.module.css"
+import style from "./lekcije.module.css"
+import Link from "next/link";
+import { User, getAuth } from "firebase/auth";
+import { loadStripe } from "@stripe/stripe-js";
+
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY!);
+
+const handleCheckout = async (userId: string) => {
+    const stripe = await stripePromise;
+
+    // menjaj link ispod da dobijes adekvatan session
+    const response = await fetch("/api/create-checkout-session/teir1checkout", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        user_id: userId,
+      }),
+    });
+
+    const session = await response.json();
+    console.log(session);
+    // Redirect the user to the Stripe checkout page
+    const result = await stripe!.redirectToCheckout({
+      sessionId: session.id,
+    });
+  };
 
 async function fetchLessons(){
     try {
-        const lekcije = await getDocs(collection(firestore, 'content', "premium", 'lekcije'));
-        lekcije.forEach(doc=>{
-            console.log(doc.id, ' => ', doc.data());
-        })
-        const documentData = lekcije.docs.map((doc) => ({
-            id: doc.id,
-            ...doc.data(),
-          }));
-        /* mozda nema potrebe da fetchujem i test neka se samo redirectuje na page za to */
-        return documentData
+        let documents:Array<object> = [];
+        await firestore.collection("content/lekcije/teir1").get().then((querySnapshot) => {
+            querySnapshot.forEach((doc) => {
+              doc.data() ? documents.push({id: doc.id, data: doc.data()}) : console.log('Document does not exist');
+            });
+          })
+        return documents
     } catch (error) {
         return 0
     }
 
 }
 
-function gotoLesson(lessonId: string){
-    console.log(lessonId)
+async function getUserData() {
+  return new Promise((resolve, reject) => {
+      const unsubscribe = getAuth().onAuthStateChanged((user) => {
+          if (user != null || user != undefined) {
+              unsubscribe();
+              firestore.collection("users").doc(user.uid).get().then(data => {
+                  resolve({...data.data(), userid: user.uid});
+              })
+          } else {
+              reject("User not authenticated.");
+          }
+      });
+  });
 }
 
-export default function lekcijePage({params}: any) {
+export default function testPage({params}: any) {
     let [lessons, setLesson] = useState<any>(null)
+    let [userData, setUserData] = useState<any>(null)
 
     useEffect(() => {
         if(!lessons){
             fetchLessons().then(e=>{
-                console.log(e)
                 setLesson(e)
+                console.log(e)
+            }).catch(e=>{
+                console.error(e)
+            })
+
+            console.log("calling get user data");
+            
+            getUserData().then(e=>{
+                console.log(e)
+                setUserData(e)
             }).catch(e=>{
                 console.error(e)
             })
         }
     }, [lessons]);
 
-    if(lessons){
-        return (
-            <main className={`${styles.nesto} bg-base-100`}>
-                {
-                    lessons.map((item:any, index:any) => (
-                        <section key={index}>   
-                            <figure className=" w-[450px] min-h-[350px]">
-                                <div className="relative h-full w-full bg-cover bg-center" style={{ backgroundImage: 'url(' + item.slikaUrl + ')' }}>
-                                    <div className="absolute top-0 left-0 w-full h-full bg-black opacity-50"></div>
-                                    <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">
-                                        <h1 className="text-4xl font-bold text-white">{item.naslov}</h1>
-                                        <p className="mt-4 text-xl text-white">{item.opis}</p>
-                                        <button className="btn block m-auto opacity-80 mt-4"><Link href={"profile/lekcija/" + item.id}>learn more</Link></button>
+    return(
+
+        <div className="bg-base-100  pb-[250px]">
+            <h1 className="text-center text-3xl">Dostupne lekcije {userData?userData.uid:"nema usera"}</h1>
+            <div className="lekcije">
+                <section>
+                    <h2 className="text-center text-2xl">Teir 1</h2>
+                    {lessons && userData?
+                        userData.products.includes("teir1")?
+                        <ul className="list-none grid grid gap-4 p-8 grid-cols-4 max-xl:grid-cols-4 max-lg:grid-cols-3 max-md:grid-cols-2 max-sm:grid-cols-1">
+                            {lessons.map((item:any, index:any) => (
+                            <section key={index}>   
+                                <li className="lekcija h-full px-3 border-solid border-2 border-gray-600 rounded-xl">
+                                    <h3 className="naslov text-center text-xl py-3 text-[2rem]">{item.id}</h3>
+                                    <img src={item.data.slikaUrl} alt="" className="cover-lekcije w-full object-contain max-h-[25vh]" />
+                                    <p className="opis text-sm text-center pt-4">{item.data.Opis}</p>
+                                    <br />
+                                    <Link href={"/profile/lekcija/teir1/" + item.id}>
+                                      <button className="btn mx-[calc(17.5%-0.75rem)] my-2 w-9/12">Saznaj vise</button>
+                                    </Link>
+                                    
+                                </li>
+                            </section>
+                            ))}
+                        </ul>:
+                        <figure className="p-8 h-[450px] px-auto m-auto overflow-hidden rounded-2xl">
+                            <h2 className="text-center text-2xl">IME_LEKCIJE</h2>
+                            <div className="hero w-full h-full" style={{backgroundImage: 'url(https://cdn.pixabay.com/photo/2017/09/12/11/56/universe-2742113_1280.jpg)'}}>
+                                <div className="hero-overlay bg-opacity-60"></div>
+                                    <div className="hero-content text-center text-neutral-content">
+                                        <div className="max-w-md">
+                                        <h1 className="mb-5 text-5xl font-bold">Niste pretplaceni na IME_LEKCIJE !</h1>
+                                        <p className="mb-5">mozda opis lekicje</p>
+                                        <button className="btn btn-primary">Saznaj vise</button>
+                                        <button className="btn btn-secondary ml-[25px]" onClick={()=>{handleCheckout(userData.userid)}}>Pretplati se</button>
                                     </div>
                                 </div>
-                            </figure>
-                            <div className="flex justify-center items-center">
-                                <p className="w-10/12 m-auto">
-                                    {item.objasnjenje}                                    
-                                </p>
                             </div>
-                        </section>
-                    ))
-                }
-                {/* <section>   
-                    <figure className=" w-[450px] min-h-[350px]">
-                        <div className="relative h-full w-full bg-cover bg-center" style={{ backgroundImage: 'url(https://picsum.photos/id/2/600/500)' }}>
-                            <div className="absolute top-0 left-0 w-full h-full bg-black opacity-50"></div>
-                            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">
-                                <h1 className="text-4xl font-bold text-white">Main Header</h1>
-                                <p className="mt-4 text-xl text-white">Description below the header</p>
-                                <button className="btn block m-auto opacity-80 mt-4">learn more</button>
-                            </div>
-                        </div>
-                    </figure>
-                    <div className="flex justify-center items-center">
-                        <p className="w-10/12 m-auto">
-                            neki opis Lorem ipsum dolor sit amet consectetur adipisicing elit. Eveniet illum modi porro exercitationem consequuntur odit rem corrupti, ut iste soluta? Alias necessitatibus laborum ea labore ipsa possimus asperiores! Dolorum, adipisci alias? Labore saepe, atque fugiat enim, repudiandae odit nemo culpa corrupti fuga, sit sed? Ipsum natus nobis aperiam aliquam, laborum sunt, dolores a excepturi cumque aut nostrum nesciunt laudantium quibusdam.
-                            
-                        </p>
-                    </div>
+                        </figure>
+                        
+                    :<p>ucitavaju se lekcije...</p>}
                 </section>
-    
-                <section className="">   
-                    <figure className=" w-[450px] h-[350px]">
-                        <div className="relative h-full w-full bg-cover bg-center" style={{ backgroundImage: 'url(https://picsum.photos/id/250/600/500)' }}>
-                            <div className="absolute top-0 left-0 w-full h-full bg-black opacity-50"></div>
-                            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">
-                                <h1 className="text-4xl font-bold text-white">Main Header</h1>
-                                <p className="mt-4 text-xl text-white">Description below the header</p>
-                                <button className="btn block m-auto opacity-80 mt-4">learn more</button>
-                            </div>
-                        </div>
-                    </figure>
-                    <div className="flex justify-center items-center w-10/12 m-auto">
-                        <p className="w-10/12 m-auto">neki opis Lorem ipsum dolor sit amet consectetur adipisicing elit. Eveniet illum modi porro exercitationem consequuntur odit rem corrupti, ut iste soluta? Alias necessitatibus laborum ea labore ipsa possimus asperiores! Dolorum, adipisci alias? Labore saepe, atque fugiat enim, repudiandae odit nemo culpa corrupti fuga, sit sed? Ipsum natus nobis aperiam aliquam, laborum sunt, dolores a excepturi cumque aut nostrum nesciunt laudantium quibusdam.</p>
-                    </div>
-                </section> */}
+
                 
-            </main>
-        )
-    }
-    else{//return skeleton here
-        return "loading"
-    }
-    
+            </div>
+        </div>
+        
+        
+    )
 }

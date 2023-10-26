@@ -1,13 +1,14 @@
 "use client"
 
 import { firebase, auth, firestore } from "@/firebase/firebaseClient"
-import { getUserData } from '@/firebase/userFunctions'
+import { getAuth } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 import { useEffect, useState } from "react";
+import Test from "@/components/Test"
 
-async function fetchLesson(lekcijaUid: string){
+async function fetchLesson(lekcijeArr: Array<string>){
     try {
-        let lekcija = (await getDoc(doc(firestore, 'content', "premium", 'lekcije', lekcijaUid))).data();
+        let lekcija = (await getDoc(doc(firestore, 'content', "lekcije", lekcijeArr[0], lekcijeArr[1]))).data();
         await getDoc(doc(firestore, 'content', "premium", 'testovi', lekcija!.testUid)).then(e=>{lekcija!.test = e.data(); delete lekcija!.testUid; console.log(e.data())})
         /* mozda nema potrebe da fetchujem i test neka se samo redirectuje na page za to */
         console.log(lekcija)
@@ -22,18 +23,43 @@ function Scroll(id: string){
     document.getElementById(id)?.scrollIntoView({behavior: "smooth"})
 }
 
+async function getUserData() {
+    return new Promise((resolve, reject) => {
+        const unsubscribe = getAuth().onAuthStateChanged((user) => {
+            if (user != null || user != undefined) {
+                unsubscribe();
+                firestore.collection("users").doc(user.uid).get().then(data => {
+                    resolve({...data.data(), userid: user.uid});
+                })
+            } else {
+                reject("User not authenticated.");
+            }
+        });
+    });
+}
+
 export default function lekcijaPage({params}: any) {
-    let [lesson, getLesson] = useState<any>(null)
+    let [lesson, setLesson] = useState<any>(null)
+    console.log(params.lekcijaUid)
 
     useEffect(() => {
         if(!lesson){
             fetchLesson(params.lekcijaUid).then(e=>{
                 console.log(e)
-                getLesson(e)
+                setLesson(e)
             }).catch(e=>{
                 console.error(e)
             })
         }
+
+        getUserData().then((e: any)=>{
+            console.log(e)
+            if(!e.products.includes("teir1")){
+                setLesson(1)
+            }
+        }).catch(e=>{
+            console.error(e)
+        })
     }, [lesson]);
 
 
@@ -47,10 +73,15 @@ export default function lekcijaPage({params}: any) {
             <p className="h-auto bg-red-600">there was an error while fetching the lesson</p>
         )
     }
+    else if(lesson == 1){
+        return (
+            <p className="h-auto bg-red-600">Niste pretplaceni na ovaj teir</p>
+        )
+    }
     else{
         return(
             <main className="bg-base-100 p-[8px]">
-                <nav className="breadcrumbs p-auto flex justify-center align-center top-12 sticky bg-base-100 z-10">{/* nestaje iza hero slike ispod */}
+                <nav className="breadcrumbs p-auto flex justify-center align-center top-0 sticky bg-base-100 z-10">{/* nestaje iza hero slike ispod */}
                     <div className="text-sm breadcrumbs text-center">
                         <ul className="p-auto">
                             <li onClick={()=>{Scroll("Video")}}><a>Video</a></li> 
@@ -85,8 +116,9 @@ export default function lekcijaPage({params}: any) {
                 </section>
 
                 <section className="test mt-[40px]" id="Test">
-                    <div className="w-[85%] h-[25vh] m-auto flex justify-center items-center text-2xl border-solid border-4 border-red-500 rounded">
-                        <span>ovo je mesto za test ili neki CTA</span>
+                    <div className="w-[85%] m-auto flex justify-center items-center text-2xl border-solid border-4 border-red-500 rounded">
+                        {/* <span>ovo je mesto za test ili neki CTA</span> */}
+                        <Test/>
                     </div>
                 </section>
             </main>

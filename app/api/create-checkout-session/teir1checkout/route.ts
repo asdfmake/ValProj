@@ -1,7 +1,8 @@
 import { loadStripe } from '@stripe/stripe-js';
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { NextResponse } from 'next/server';
-import stripe from "../../../stripe/stripeClient"
+//import stripe from "../../../../stripe/stripeClient"
+import stripe from "@/stripe/stripeClient"
 
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY!);
@@ -19,18 +20,19 @@ export async function POST(req: Request, res: NextApiResponse) {
             payment_method_types: ['card'],
             line_items: [
             {
-                price: 'price_1NkPGKD33Gveml2rmHoaFVQT',
+                price: 'price_1NkPGKD33Gveml2rmHoaFVQT', // Replace with your actual price ID
                 quantity: 1,
             },
             ],
+            /* mode: 'subscription', */
             mode: 'payment',
-            success_url: "http://localhost:3000/checkout",
-            cancel_url: "http://localhost:3000/checkout",
+            success_url: "http://localhost:3000/profile",
+            cancel_url: "http://localhost:3000/profile",
             metadata: {
                 'user_id': user_id,
-            },
+                'product': 'teir1'
+              },
         });
-        console.log('Stripe API response:', session);
         
         return NextResponse.json({ id: session.id });
         } catch (error: any) {
@@ -39,6 +41,6 @@ export async function POST(req: Request, res: NextApiResponse) {
             return NextResponse.json({ error: error.message });
         }
     } else {
-        console.log("jebem li ga neki error")
+        console.log("jebem li ga neki error za teir1checkout")
     }
 }
